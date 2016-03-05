@@ -133,7 +133,7 @@ function renderBornycentre (bornycentre$) {
             div('.card-content', [
               div('.card-title', 'Yay! Easy to share 😁'),
               `Looks like that's my #Bornycentre: `,
-              a(mapLink),
+              a('.truncate', mapLink),
               div([
                 `Where's yours?! Find out `,
                 a(DOMAIN)
@@ -143,7 +143,7 @@ function renderBornycentre (bornycentre$) {
               a('.btn-large .indigo',
                 {href: mapLink, target: '_blank'},
                 [
-                  'My Bornycentre in full-width',
+                  span('.hide-on-small-and-down', 'My Bornycentre in full-width'),
                   i('.material-icons .right', 'open_in_new')
                 ]
               )
