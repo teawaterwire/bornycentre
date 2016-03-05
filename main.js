@@ -44,12 +44,14 @@ function computeSelectedCitiesStream (city$) {
   return selectedCities$
 }
 
-function computeReturnedCitiesStream (selectedCities$, cities$) {
+function computeReturnedCitiesStream (selectedCities$, cities$, requestCities$) {
   const returnedCities = Observable.combineLatest(selectedCities$, cities$,
     (selectedCities, cities) =>
       cities.filter(city => selectedCities.every(c => c.name !== city.name))
     )
     .startWith([])
+    .merge(requestCities$.map(r => null))
+    .debounce(200)
   return returnedCities
 }
 
@@ -83,15 +85,17 @@ function renderForm (returnedCities$) {
         div('.row', [
           div('.js-results .col .s8 .push-s2 .center-align',
             {style: {minHeight: '100px'}},
-            returnedCities
-              .map(city =>
-                a('.js-result .btn', {
-                  style: {margin: '5px'},
-                  city: city
-                },
-                  `${city.name}, ${city.countryName}`
-                )
-              )
+            returnedCities === null
+              ? div('.progress', [div('.indeterminate')])
+              : returnedCities
+                  .map(city =>
+                    a('.js-result .btn', {
+                      style: {margin: '5px'},
+                      city: city
+                    },
+                      `${city.name}, ${city.countryName}`
+                    )
+                  )
             )
         ])
       ])
@@ -163,7 +167,7 @@ function main (sources) {
   const selectCity$ = createSelectCityStream(sources.DOM)
   // action -> state
   const selectedCities$ = computeSelectedCitiesStream(selectCity$)
-  const returnedCities$ = computeReturnedCitiesStream(selectedCities$, receiveCities$)
+  const returnedCities$ = computeReturnedCitiesStream(selectedCities$, receiveCities$, requestCities$)
   const bornycentre$ = computeBornycentreStream(selectCity$)
   // state -> view
   const formVTree$ = renderForm(returnedCities$)
