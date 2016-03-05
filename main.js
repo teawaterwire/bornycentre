@@ -1,9 +1,9 @@
 import Cycle from '@cycle/core'
-import {makeDOMDriver, div, input, ol, li, a, iframe, label, i} from '@cycle/dom'
+import {makeDOMDriver, div, input, ol, li, a, iframe, label, i, span} from '@cycle/dom'
 import {makeHTTPDriver} from '@cycle/http'
 import {Observable} from 'rx'
 import {cloneDeep} from 'lodash'
-import {MAPS_KEY, MAPS_EMBED_URL} from './config.js'
+import {MAPS_KEY, MAPS_EMBED_URL, DOMAIN} from './config.js'
 
 function createRequestCitiesStream (DOM) {
   const request$ = DOM.select('.js-name-input')
@@ -126,18 +126,29 @@ function renderBornycentre (bornycentre$) {
         return null
       }
       const coords = `${bornycentre.lat},${bornycentre.lng}`
+      const mapLink = `https://www.google.com/maps/place/${coords}`
       return (
-        div('.center-align', [
-          a('.btn-large .indigo',
-            {
-              href: `https://www.google.com/maps/place/${coords}`,
-              target: '_blank',
-              style: {margin: '30px'}
-            }, [
-              'My Bornycentre',
-              i('.material-icons .right', 'open_in_new')
-            ]
-          ),
+        div('.row .center-align', [
+          div('.card .col .s8 .push-s2', {style: {margin: '30px'}}, [
+            div('.card-content', [
+              div('.card-title', 'Yay! Easy to share 😁'),
+              `Looks like that's my #Bornycentre: `,
+              a(mapLink),
+              div([
+                `Where's yours?! Find out `,
+                a(DOMAIN)
+              ])
+            ]),
+            div('.card-action', [
+              a('.btn-large .indigo',
+                {href: mapLink, target: '_blank'},
+                [
+                  'My Bornycentre in full-width',
+                  i('.material-icons .right', 'open_in_new')
+                ]
+              )
+            ])
+          ]),
           div([
             iframe({
               src: `${MAPS_EMBED_URL}?key=${MAPS_KEY}&q=${coords}&zoom=10`,
