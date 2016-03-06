@@ -46,8 +46,8 @@ function computeSelectedCitiesStream (city$) {
 
 function computeReturnedCitiesStream (selectedCities$, cities$, requestCities$) {
   const returnedCities = Observable.combineLatest(selectedCities$, cities$,
-    (selectedCities, cities) =>
-      cities.filter(city => selectedCities.every(c => c.name !== city.name))
+      (selectedCities, cities) =>
+        cities.filter(city => selectedCities.every(c => c.name !== city.name))
     )
     .startWith([])
     .merge(requestCities$.map(r => null))
