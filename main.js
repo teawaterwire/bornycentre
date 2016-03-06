@@ -129,7 +129,7 @@ function renderBornycentre (bornycentre$) {
       const mapLink = `https://www.google.com/maps/place/${coords}`
       return (
         div('.row .center-align', [
-          div('.card .col .s8 .push-s2', {style: {margin: '30px'}}, [
+          div('.card .col .s8 .push-s2', {style: {margin: '30px 0'}}, [
             div('.card-content', [
               div('.card-title', 'Yay! Easy to share 😁'),
               `Looks like that's my #Bornycentre: `,
