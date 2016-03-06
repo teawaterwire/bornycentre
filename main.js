@@ -1,5 +1,5 @@
 import Cycle from '@cycle/core'
-import {makeDOMDriver, div, input, ol, li, a, iframe, label, i, span} from '@cycle/dom'
+import {makeDOMDriver, div, input, ol, li, a, iframe, label, i} from '@cycle/dom'
 import {makeHTTPDriver} from '@cycle/http'
 import {Observable} from 'rx'
 import {cloneDeep, assign} from 'lodash'
@@ -143,7 +143,7 @@ function renderBornycentre (bornycentre$) {
               a('.btn-large .indigo',
                 {href: mapLink, target: '_blank'},
                 [
-                  span('.hide-on-small-and-down', 'My Bornycentre in full-width'),
+                  'Open in GMaps',
                   i('.material-icons .right', 'open_in_new')
                 ]
               )
