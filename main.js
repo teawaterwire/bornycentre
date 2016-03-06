@@ -2,7 +2,7 @@ import Cycle from '@cycle/core'
 import {makeDOMDriver, div, input, ol, li, a, iframe, label, i, span} from '@cycle/dom'
 import {makeHTTPDriver} from '@cycle/http'
 import {Observable} from 'rx'
-import {cloneDeep} from 'lodash'
+import {cloneDeep, assign} from 'lodash'
 import {MAPS_KEY, MAPS_EMBED_URL, DOMAIN} from './config.js'
 
 function createRequestCitiesStream (DOM) {
@@ -64,7 +64,7 @@ function computeBornycentreStream (city$) {
         sumLng: bornycentre.sumLng + parseFloat(city.lng),
         count: bornycentre.count + 1
       }
-      return Object.assign({
+      return assign({
         lat: newBorn.sumLat / newBorn.count,
         lng: newBorn.sumLng / newBorn.count
       }, newBorn)
@@ -149,7 +149,7 @@ function renderBornycentre (bornycentre$) {
               )
             ])
           ]),
-          div([
+          div('.col .s12', [
             iframe({
               src: `${MAPS_EMBED_URL}?key=${MAPS_KEY}&q=${coords}&zoom=10`,
               width: '100%',
