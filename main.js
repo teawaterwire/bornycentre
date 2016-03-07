@@ -1,5 +1,5 @@
 import Cycle from '@cycle/core'
-import {makeDOMDriver, div, input, ol, li, a, iframe, label, i} from '@cycle/dom'
+import {makeDOMDriver, div, input, ol, li, a, iframe, label, i, h5} from '@cycle/dom'
 import {makeHTTPDriver} from '@cycle/http'
 import {Observable} from 'rx'
 import {cloneDeep, assign} from 'lodash'
@@ -37,6 +37,13 @@ function createReceiveCitiesStream (HTTP) {
   return cities$
 }
 
+function createRevealBornycentreStream (DOM) {
+  const revealBornycentre$ = DOM.select('.js-generate-borny')
+    .events('click')
+    .map(() => true)
+  return revealBornycentre$
+}
+
 function computeSelectedCitiesStream (city$) {
   const selectedCities$ = city$
     .startWith([])
@@ -44,7 +51,7 @@ function computeSelectedCitiesStream (city$) {
   return selectedCities$
 }
 
-function computeReturnedCitiesStream (selectedCities$, cities$, requestCities$) {
+function computeReturnedCitiesStream (cities$, requestCities$, selectedCities$) {
   const returnedCities = Observable.combineLatest(selectedCities$, cities$,
       (selectedCities, cities) =>
         cities.filter(city => selectedCities.every(c => c.name !== city.name))
@@ -111,17 +118,24 @@ function renderSelectedCities (cities$) {
         return null
       }
       return (
-        ol('.collection', cities.map(city =>
-          li('.collection-item', `${city.name}, ${city.countryName}`)
-        ))
+        div([
+          ol('.collection', cities.map(city =>
+            li('.collection-item', `${city.name}, ${city.countryName}`)
+          )),
+          h5({style: {display: 'inline-block', 'vertical-align': 'middle'}}, '👉 Add more cities or'),
+          a('.btn .brown .js-generate-borny', {style: {'margin-left': '8px'}}, [
+            'generate your Bornycentre',
+            i('.material-icons .right', 'child_care')
+          ])
+        ])
       )
     })
   return vtree$
 }
 
-function renderBornycentre (bornycentre$) {
-  const vtree$ = bornycentre$
-    .map(bornycentre => {
+function renderBornycentre (bornycentre$, selectedCities$, reveal$) {
+  const vtree$ = bornycentre$.withLatestFrom(selectedCities$,
+    (bornycentre, selectedCities) => {
       if (bornycentre.count === 0) {
         return null
       }
@@ -130,24 +144,14 @@ function renderBornycentre (bornycentre$) {
       return (
         div('.row .center-align', [
           div('.card .col .s8 .push-s2', {style: {margin: '30px 0'}}, [
-            div('.card-content', [
-              div('.card-title', 'Yay! Easy to share 😁'),
-              `Looks like that's my #Bornycentre: `,
+            div('.card-content', {style: {'font-size': '20px'}}, [
+              '📍',
+              selectedCities.map(c => c.name).join(', '),
+              `. Looks like that's my #Bornycentre: `,
               a('.truncate', mapLink),
-              div([
-                `Where's yours?! Find out `,
-                a(DOMAIN)
-              ])
+              div([`Find yours `, a(DOMAIN)])
             ]),
-            div('.card-action', [
-              a('.btn-large .indigo',
-                {href: mapLink, target: '_blank'},
-                [
-                  'Open in GMaps',
-                  i('.material-icons .right', 'open_in_new')
-                ]
-              )
-            ])
+            div('.card-action', '( Yay! Easy to copy, paste and share 😁)')
           ]),
           div('.col .s12', [
             iframe({
@@ -156,11 +160,16 @@ function renderBornycentre (bornycentre$) {
               height: 450,
               frameborder: 0,
               style: {border: 0}
-            })
+            }),
+            a('.btn-large .indigo .left', {href: mapLink, target: '_blank'}, [
+              'Open in GMaps', i('.material-icons .right', 'open_in_new')
+            ])
           ])
         ])
       )
     })
+    .pausableBuffered(reveal$)
+    .startWith(null)
   return vtree$
 }
 
@@ -176,14 +185,15 @@ function main (sources) {
   const requestCities$ = createRequestCitiesStream(sources.DOM)
   const receiveCities$ = createReceiveCitiesStream(sources.HTTP)
   const selectCity$ = createSelectCityStream(sources.DOM)
+  const revealBornycentre$ = createRevealBornycentreStream(sources.DOM)
   // action -> state
   const selectedCities$ = computeSelectedCitiesStream(selectCity$)
-  const returnedCities$ = computeReturnedCitiesStream(selectedCities$, receiveCities$, requestCities$)
+  const returnedCities$ = computeReturnedCitiesStream(receiveCities$, requestCities$, selectedCities$)
   const bornycentre$ = computeBornycentreStream(selectCity$)
   // state -> view
   const formVTree$ = renderForm(returnedCities$)
   const selectedVTree$ = renderSelectedCities(selectedCities$)
-  const bornycentreVTree$ = renderBornycentre(bornycentre$)
+  const bornycentreVTree$ = renderBornycentre(bornycentre$, selectedCities$, revealBornycentre$)
   const vtree$ = wrap(formVTree$, selectedVTree$, bornycentreVTree$)
 
   return {
