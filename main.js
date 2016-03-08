@@ -62,9 +62,8 @@ function computeReturnedCitiesStream (cities$, requestCities$, selectedCities$) 
   return returnedCities
 }
 
-function computeBornycentreStream (city$) {
+function computeBornycentreStream (city$, reveal$) {
   const bornycentre$ = city$
-    .startWith({sumLat: 0, sumLng: 0, count: 0})
     .scan((bornycentre, city) => {
       const newBorn = {
         sumLat: bornycentre.sumLat + parseFloat(city.lat),
@@ -75,7 +74,10 @@ function computeBornycentreStream (city$) {
         lat: newBorn.sumLat / newBorn.count,
         lng: newBorn.sumLng / newBorn.count
       }, newBorn)
-    })
+    }, {sumLat: 0, sumLng: 0, count: 0})
+    .pausableBuffered(reveal$)
+    .startWith(null)
+
   return bornycentre$
 }
 
@@ -133,10 +135,10 @@ function renderSelectedCities (cities$) {
   return vtree$
 }
 
-function renderBornycentre (bornycentre$, selectedCities$, reveal$) {
+function renderBornycentre (bornycentre$, selectedCities$) {
   const vtree$ = bornycentre$.withLatestFrom(selectedCities$,
     (bornycentre, selectedCities) => {
-      if (bornycentre.count === 0) {
+      if (bornycentre === null) {
         return null
       }
       const coords = `${bornycentre.lat},${bornycentre.lng}`
@@ -168,8 +170,6 @@ function renderBornycentre (bornycentre$, selectedCities$, reveal$) {
         ])
       )
     })
-    .pausableBuffered(reveal$)
-    .startWith(null)
   return vtree$
 }
 
@@ -189,11 +189,11 @@ function main (sources) {
   // action -> state
   const selectedCities$ = computeSelectedCitiesStream(selectCity$)
   const returnedCities$ = computeReturnedCitiesStream(receiveCities$, requestCities$, selectedCities$)
-  const bornycentre$ = computeBornycentreStream(selectCity$)
+  const bornycentre$ = computeBornycentreStream(selectCity$, revealBornycentre$)
   // state -> view
   const formVTree$ = renderForm(returnedCities$)
   const selectedVTree$ = renderSelectedCities(selectedCities$)
-  const bornycentreVTree$ = renderBornycentre(bornycentre$, selectedCities$, revealBornycentre$)
+  const bornycentreVTree$ = renderBornycentre(bornycentre$, selectedCities$)
   const vtree$ = wrap(formVTree$, selectedVTree$, bornycentreVTree$)
 
   return {
