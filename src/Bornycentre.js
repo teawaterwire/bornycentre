@@ -1,4 +1,4 @@
-import {div, a, iframe, i} from '@cycle/dom'
+import {div, h5, iframe} from '@cycle/dom'
 import {assign} from 'lodash'
 import {MAPS_KEY, MAPS_EMBED_URL, DOMAIN} from '../config.js'
 
@@ -42,29 +42,29 @@ function renderBornycentre (bornycentre$, selectedCities$) {
         return null
       }
       const coords = `${bornycentre.lat},${bornycentre.lng}`
+      const cityNames = selectedCities.map(c => c.name).join(', ')
       const mapLink = `https://www.google.com/maps/place/${coords}`
+      const encodedText = encodeURIComponent(`📍 ${cityNames}. Looks like that's my #Bornycentre: ${mapLink}
+Find yours`)
+      let twitterIframeUrl = 'https://platform.twitter.com/widgets/tweet_button.html?'
+      twitterIframeUrl += 'size=l'
+      twitterIframeUrl += `&url=${DOMAIN}`
+      twitterIframeUrl += `&text=${encodedText}`
       return (
         div('.row .center-align', [
           div('.card .col .s8 .push-s2', {style: {margin: '30px 0'}}, [
             div('.card-content', {style: {'font-size': '20px'}}, [
-              '📍',
-              selectedCities.map(c => c.name).join(', '),
-              `. Looks like that's my #Bornycentre: `,
-              a('.truncate', mapLink),
-              div([`Find yours `, a(DOMAIN)])
+              iframe({
+                src: `${MAPS_EMBED_URL}?key=${MAPS_KEY}&q=${coords}&zoom=9`,
+                width: '100%',
+                height: 450,
+                frameborder: 0,
+                style: {border: 0}
+              })
             ]),
-            div('.card-action', '( Yay! Easy to copy, paste and share 😁)')
-          ]),
-          div('.col .s12', [
-            iframe({
-              src: `${MAPS_EMBED_URL}?key=${MAPS_KEY}&q=${coords}&zoom=10`,
-              width: '100%',
-              height: 450,
-              frameborder: 0,
-              style: {border: 0}
-            }),
-            a('.btn-large .indigo .left', {href: mapLink, target: '_blank'}, [
-              'Open in GMaps', i('.material-icons .right', 'open_in_new')
+            div('.card-action', [
+              h5('Yay! Easy to share 😁'),
+              iframe({src: twitterIframeUrl, width: 80, height: 30, style: {border: 0}})
             ])
           ])
         ])
