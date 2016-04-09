@@ -5,6 +5,7 @@ import {MAPS_KEY, MAPS_EMBED_URL, DOMAIN} from '../config.js'
 function createRevealBornycentreStream (DOM) {
   const revealBornycentre$ = DOM.select('.js-generate-borny')
     .events('click')
+    .do(() => setTimeout(() => window.$('#bornycard').velocity('scroll'), 300))
     .map(() => true)
   return revealBornycentre$
 }
@@ -52,7 +53,7 @@ Find yours`)
       twitterIframeUrl += `&text=${encodedText}`
       return (
         div('.row .center-align', [
-          div('.card .col .s8 .push-s2', {style: {margin: '30px 0'}}, [
+          div('#bornycard .card .col .s8 .push-s2', {style: {margin: '30px 0'}}, [
             div('.card-content', {style: {'font-size': '20px'}}, [
               iframe({
                 src: `${MAPS_EMBED_URL}?key=${MAPS_KEY}&q=${coords}&zoom=9`,

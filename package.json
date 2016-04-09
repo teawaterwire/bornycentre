@@ -24,7 +24,9 @@
     "browserify": "^13.0.0",
     "express": "^4.13.4",
     "lodash": "^4.6.1",
-    "rx": "^4.0.8",
+    "rx": "^4.0.8"
+  },
+  "devDependencies": {
     "watchify": "^3.7.0"
   }
 }
