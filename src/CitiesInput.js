@@ -41,7 +41,7 @@ function computeSelectedCitiesStream (city$) {
 }
 
 function computeReturnedCitiesStream (cities$, selectCity$, requestCities$) {
-  const returnedCities$ = cities$.withLatestFrom(
+  const returnedCities$ = cities$.combineLatest(
       computeSelectedCitiesStream(selectCity$),
       (cities, selectedCities) =>
         cities.filter(city => selectedCities.every(c => c.name !== city.name))
