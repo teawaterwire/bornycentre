@@ -65,7 +65,7 @@ Find yours`)
             ]),
             div('.card-action', [
               h5('Yay! Easy to share 😁'),
-              iframe({src: twitterIframeUrl, width: 80, height: 30, style: {border: 0}})
+              iframe({src: twitterIframeUrl, scrolling: 'no', width: 80, height: 30, style: {border: 0}})
             ])
           ])
         ])
