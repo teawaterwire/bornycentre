@@ -7,4 +7,3 @@ Made with [Cycle.js](http://cycle.js.org/).
 
 :ghost:
 
-![alt text](https://dl.dropboxusercontent.com/u/17017251/bornycentre.gif "Coucou les enfants !")
