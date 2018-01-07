@@ -3,7 +3,7 @@ _The place that represents the (iso)barycentre of the cities where you lived at 
 
 Made with [Cycle.js](http://cycle.js.org/).
 
-[Demo](http://bornycent.re/).
+[Demo](http://bornycentre.herokuapp.com/).
 
 :ghost:
 
